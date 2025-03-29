@@ -27,9 +27,6 @@ st.title("📊 Dashboard de Transações Bancárias")
 db_manager = DatabaseManager()
 df = db_manager.load_transactions()
 
-# Converte a coluna de data para datetime
-df['date'] = pd.to_datetime(df['date'])
-
 # Filtro de data
 col1, col2 = st.columns([1, 4])
 with col1:
@@ -60,11 +57,11 @@ with col2:
     st.metric("Saldo Total", f"R$ {total_amount:,.2f}")
 
 with col3:
-    total_credits = df_filtered[df_filtered['type'] == 'credit']['amount'].sum()
+    total_credits = df_filtered[df_filtered['type'] == 'credit']['amount'].abs().sum()
     st.metric("Total de Créditos", f"R$ {total_credits:,.2f}")
 
 with col4:
-    total_debits = df_filtered[df_filtered['type'] == 'debit']['amount'].sum()
+    total_debits = df_filtered[df_filtered['type'] == 'debit']['amount'].abs().sum()
     st.metric("Total de Débitos", f"R$ {total_debits:,.2f}")
 
 # Gráficos em duas colunas

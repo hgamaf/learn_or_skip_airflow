@@ -47,7 +47,17 @@ class DatabaseManager:
     def load_transactions(self) -> pd.DataFrame:
         """Carrega todas as transações do banco de dados."""
         with sqlite3.connect(self.db_path) as conn:
-            return pd.read_sql_query("SELECT * FROM transactions", conn)
+            # Carrega os dados
+            df = pd.read_sql_query("SELECT * FROM transactions", conn)
+            
+            # Converte os tipos de dados
+            df['date'] = pd.to_datetime(df['date'])
+            df['amount'] = pd.to_numeric(df['amount'], errors='coerce')
+            df['type'] = df['type'].astype(str)
+            df['category'] = df['category'].astype(str)
+            df['description'] = df['description'].astype(str)
+            
+            return df
 
     def clear_transactions(self):
         """Remove todas as transações do banco de dados."""

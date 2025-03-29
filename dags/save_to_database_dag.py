@@ -1,8 +1,15 @@
 """DAG para salvar dados de transações no banco de dados."""
 from datetime import datetime, timedelta
 from airflow import DAG
+from airflow.decorators import dag
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+import sys
+from pathlib import Path
+
+# Adiciona o diretório raiz ao PYTHONPATH
+root_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(root_dir))
 
 from src.database.operations import save_transactions_to_db
 
