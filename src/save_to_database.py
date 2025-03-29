@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import sqlite3
 from datetime import datetime
+from src.database.db_manager import DatabaseManager
 
 def save_to_database():
     # Caminho do arquivo CSV
@@ -21,17 +22,13 @@ def save_to_database():
     # Converte a coluna de data para datetime
     df['date'] = pd.to_datetime(df['date'])
     
-    # Cria conexão com o banco de dados
-    db_path = data_dir / 'transactions.db'
-    conn = sqlite3.connect(db_path)
+    # Inicializa o gerenciador de banco de dados
+    db_manager = DatabaseManager()
     
     # Salva os dados
-    df.to_sql('transactions', conn, if_exists='replace', index=False)
+    db_manager.save_transactions(df.to_dict('records'))
     
-    # Fecha a conexão
-    conn.close()
-    
-    print(f"Dados salvos com sucesso no banco de dados: {db_path}")
+    print(f"Dados salvos com sucesso no banco de dados: {db_manager.db_path}")
 
 if __name__ == "__main__":
     save_to_database() 

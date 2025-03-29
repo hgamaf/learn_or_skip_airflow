@@ -4,8 +4,6 @@ from pathlib import Path
 from typing import List
 import pandas as pd
 
-from src.models.transaction import Transaction
-
 class DatabaseManager:
     """Classe responsável por gerenciar operações no banco de dados SQLite."""
 
@@ -24,26 +22,24 @@ class DatabaseManager:
             # Cria tabela de transações
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS transactions (
-                    transaction_id INTEGER PRIMARY KEY,
-                    account_id INTEGER NOT NULL,
                     date DATETIME NOT NULL,
+                    description TEXT,
                     amount REAL NOT NULL,
-                    type TEXT NOT NULL,
                     category TEXT NOT NULL,
-                    description TEXT
+                    type TEXT NOT NULL
                 )
             """)
             
             conn.commit()
 
-    def save_transactions(self, transactions: List[Transaction]):
+    def save_transactions(self, transactions: List[dict]):
         """Salva uma lista de transações no banco de dados."""
         with sqlite3.connect(self.db_path) as conn:
             # Converte as transações para um DataFrame
-            df = pd.DataFrame([vars(t) for t in transactions])
+            df = pd.DataFrame(transactions)
             
             # Salva no banco de dados
-            df.to_sql('transactions', conn, if_exists='append', index=False)
+            df.to_sql('transactions', conn, if_exists='replace', index=False)
 
     def load_transactions(self) -> pd.DataFrame:
         """Carrega todas as transações do banco de dados."""
