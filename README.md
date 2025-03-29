@@ -26,7 +26,6 @@ graph TD
 ## Pré-requisitos
 
 - Python 3.8+
-- Node.js 18+
 - [uv](https://github.com/astral-sh/uv) - Gerenciador de pacotes Python mais rápido
 - [Astro CLI](https://docs.astronomer.io/astro/cli/install-cli) - CLI do Astronomer
 
