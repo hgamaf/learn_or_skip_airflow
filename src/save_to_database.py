@@ -1,54 +1,37 @@
-"""Script para salvar dados do CSV no banco de dados SQLite."""
+"""Script para salvar dados de transações no banco de dados."""
 import pandas as pd
+from pathlib import Path
+import sqlite3
 from datetime import datetime
 
-from src.database.db_manager import DatabaseManager
-from src.models.transaction import Transaction
-
-def csv_to_transactions(csv_path: str) -> list[Transaction]:
-    """Converte dados do CSV para objetos Transaction."""
-    df = pd.read_csv(csv_path)
-    transactions = []
-    
-    for _, row in df.iterrows():
-        transaction = Transaction(
-            transaction_id=row['transaction_id'],
-            account_id=row['account_id'],
-            date=datetime.fromisoformat(row['date']),
-            amount=row['amount'],
-            type=row['type'],
-            category=row['category'],
-            description=row['description']
-        )
-        transactions.append(transaction)
-    
-    return transactions
-
-def main():
-    """Função principal que lê o CSV e salva no banco de dados."""
+def save_to_database():
     # Caminho do arquivo CSV
-    csv_path = "bank_transactions.csv"
+    data_dir = Path(__file__).parent.parent / 'data'
+    csv_file = data_dir / 'transactions.csv'
     
-    # Inicializa o gerenciador de banco de dados
-    db_manager = DatabaseManager()
+    # Verifica se o arquivo existe
+    if not csv_file.exists():
+        print(f"Erro: Arquivo {csv_file} não encontrado.")
+        print("Execute primeiro o script generate_transactions.py para gerar os dados.")
+        return
     
-    try:
-        # Lê as transações do CSV
-        transactions = csv_to_transactions(csv_path)
-        
-        # Salva no banco de dados
-        db_manager.save_transactions(transactions)
-        
-        # Verifica se os dados foram salvos corretamente
-        df = db_manager.load_transactions()
-        print(f"Dados salvos com sucesso no banco de dados!")
-        print(f"Total de transações no banco: {len(df)}")
-        
-    except FileNotFoundError:
-        print(f"Erro: Arquivo {csv_path} não encontrado!")
-        print("Execute primeiro o script generate_bank_transactions.py")
-    except Exception as e:
-        print(f"Erro ao processar os dados: {str(e)}")
+    # Lê o CSV
+    df = pd.read_csv(csv_file)
+    
+    # Converte a coluna de data para datetime
+    df['date'] = pd.to_datetime(df['date'])
+    
+    # Cria conexão com o banco de dados
+    db_path = data_dir / 'transactions.db'
+    conn = sqlite3.connect(db_path)
+    
+    # Salva os dados
+    df.to_sql('transactions', conn, if_exists='replace', index=False)
+    
+    # Fecha a conexão
+    conn.close()
+    
+    print(f"Dados salvos com sucesso no banco de dados: {db_path}")
 
 if __name__ == "__main__":
-    main() 
+    save_to_database() 

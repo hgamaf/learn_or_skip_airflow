@@ -9,9 +9,11 @@ from src.models.transaction import Transaction
 class DatabaseManager:
     """Classe responsável por gerenciar operações no banco de dados SQLite."""
 
-    def __init__(self, db_path: str = "bank_transactions.db"):
+    def __init__(self):
         """Inicializa o gerenciador de banco de dados."""
-        self.db_path = db_path
+        # Define o caminho do banco de dados
+        data_dir = Path(__file__).parent.parent.parent / 'data'
+        self.db_path = data_dir / 'transactions.db'
         self._create_tables()
 
     def _create_tables(self):
