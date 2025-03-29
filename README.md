@@ -34,12 +34,14 @@ graph TB
         G -->|"Gera"| M[Tabela de Dados]
     end
 
-    style Airflow fill:#f9d5e5,stroke:#333,stroke-width:2px
-    style API fill:#eeeeee,stroke:#333,stroke-width:2px
-    style Dashboard fill:#d5e8d4,stroke:#333,stroke-width:2px
+    style Airflow fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style API fill:#f0f8f0,stroke:#2e7d32,stroke-width:2px
+    style Dashboard fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     
-    classDef storage fill:#fff,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
+    classDef storage fill:#ffffff,stroke:#666666,stroke-width:2px,stroke-dasharray: 5 5
     class C,F storage
+
+    linkStyle default stroke:#666666,stroke-width:2px
 ```
 
 ## Pré-requisitos
