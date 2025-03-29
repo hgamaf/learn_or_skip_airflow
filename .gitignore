@@ -1,0 +1,48 @@
+# Arquivos de dados
+*.csv
+*.xlsx
+*.xls
+*.json
+*.xml
+*.db
+*.sqlite
+*.sqlite3
+
+# Ambiente virtual Python
+.venv/
+venv/
+ENV/
+env/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de distribuição
+dist/
+build/
+*.egg-info/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Arquivos de teste
+.coverage
+htmlcov/
+.pytest_cache/
