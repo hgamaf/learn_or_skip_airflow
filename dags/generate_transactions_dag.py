@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-
-from src.data_generators.bank_transaction_generator import BankTransactionGenerator
-from src.utils.constants import DEFAULT_DAYS_BACK
+from pathlib import Path
+import pandas as pd
+import numpy as np
 
 # Argumentos padrão da DAG
 default_args = {
@@ -17,30 +17,54 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-def generate_transactions():
+def generate_transactions(n_transactions=1000):
     """Função que gera as transações e salva em CSV."""
-    # Define o período de transações (últimos 30 dias)
+    # Cria diretório de dados se não existir
+    data_dir = Path("/usr/local/airflow/data")
+    data_dir.mkdir(exist_ok=True)
+    
+    # Gera datas aleatórias
     end_date = datetime.now()
-    start_date = end_date - timedelta(days=DEFAULT_DAYS_BACK)
+    start_date = end_date - timedelta(days=365)
+    dates = pd.date_range(start=start_date, end=end_date, periods=n_transactions)
     
-    # Inicializa o gerador
-    generator = BankTransactionGenerator()
+    # Lista de descrições comuns
+    descriptions = [
+        "Supermercado", "Restaurante", "Transporte", "Energia", "Água",
+        "Internet", "Telefone", "Netflix", "Spotify", "Amazon",
+        "Farmácia", "Posto de Gasolina", "Shopping", "Cinema", "Teatro",
+        "Academia", "Médico", "Dentista", "Escola", "Faculdade"
+    ]
     
-    # Gera as transações
-    transactions = generator.generate_transactions(start_date, end_date)
+    # Lista de categorias
+    categories = [
+        "Alimentação", "Moradia", "Transporte", "Saúde", "Educação",
+        "Lazer", "Serviços", "Compras", "Outros"
+    ]
     
-    # Converte para DataFrame
-    import pandas as pd
-    df = pd.DataFrame([vars(t) for t in transactions])
+    # Gera dados aleatórios
+    data = {
+        'date': dates,
+        'description': np.random.choice(descriptions, n_transactions),
+        'amount': np.random.normal(100, 50, n_transactions).round(2),
+        'category': np.random.choice(categories, n_transactions),
+        'type': np.random.choice(['credit', 'debit'], n_transactions)
+    }
     
-    # Ordena por data
-    df = df.sort_values("date")
+    # Cria DataFrame
+    df = pd.DataFrame(data)
+    
+    # Ajusta valores negativos para débitos
+    df.loc[df['type'] == 'debit', 'amount'] = -abs(df.loc[df['type'] == 'debit', 'amount'])
+    df.loc[df['type'] == 'credit', 'amount'] = abs(df.loc[df['type'] == 'credit', 'amount'])
     
     # Salva em CSV
-    output_file = "bank_transactions.csv"
-    df.to_csv(output_file, index=False)
-    print(f"Dados salvos em {output_file}")
-    print(f"Total de transações geradas: {len(transactions)}")
+    csv_file = data_dir / 'transactions.csv'
+    df.to_csv(csv_file, index=False)
+    
+    print(f"Dados gerados com sucesso: {csv_file}")
+    print(f"Total de transações: {len(df)}")
+    print(f"Período: {df['date'].min().strftime('%Y-%m-%d')} até {df['date'].max().strftime('%Y-%m-%d')}")
 
 # Define a DAG
 dag = DAG(

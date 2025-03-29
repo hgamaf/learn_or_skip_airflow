@@ -23,10 +23,10 @@ class DatabaseManager:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS transactions (
                     date DATETIME NOT NULL,
-                    description TEXT,
-                    amount REAL NOT NULL,
-                    category TEXT NOT NULL,
-                    type TEXT NOT NULL
+                    description VARCHAR(255),
+                    amount DECIMAL(10,2) NOT NULL,
+                    category VARCHAR(50) NOT NULL,
+                    type VARCHAR(10) NOT NULL
                 )
             """)
             
@@ -37,6 +37,9 @@ class DatabaseManager:
         with sqlite3.connect(self.db_path) as conn:
             # Converte as transações para um DataFrame
             df = pd.DataFrame(transactions)
+            
+            # Garante que a coluna de data está no formato correto
+            df['date'] = pd.to_datetime(df['date'])
             
             # Salva no banco de dados
             df.to_sql('transactions', conn, if_exists='replace', index=False)

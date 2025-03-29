@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+from pathlib import Path
 
 from src.database.db_manager import DatabaseManager
-from src.models.transaction import Transaction
 import pandas as pd
 
 # Argumentos padrão da DAG
@@ -18,42 +18,27 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-def csv_to_transactions(csv_path: str) -> list[Transaction]:
-    """Converte dados do CSV para objetos Transaction."""
-    df = pd.read_csv(csv_path)
-    transactions = []
-    
-    for _, row in df.iterrows():
-        transaction = Transaction(
-            transaction_id=row['transaction_id'],
-            account_id=row['account_id'],
-            date=datetime.fromisoformat(row['date']),
-            amount=row['amount'],
-            type=row['type'],
-            category=row['category'],
-            description=row['description']
-        )
-        transactions.append(transaction)
-    
-    return transactions
-
 def save_to_database():
     """Função que lê o CSV e salva no banco de dados."""
     # Caminho do arquivo CSV
-    csv_path = "bank_transactions.csv"
-    
-    # Inicializa o gerenciador de banco de dados
-    db_manager = DatabaseManager()
+    data_dir = Path("/usr/local/airflow/data")
+    csv_file = data_dir / "transactions.csv"
     
     try:
-        # Lê as transações do CSV
-        transactions = csv_to_transactions(csv_path)
+        # Lê o CSV
+        df = pd.read_csv(csv_file)
+        
+        # Converte a coluna de data para datetime
+        df['date'] = pd.to_datetime(df['date'])
+        
+        # Inicializa o gerenciador de banco de dados
+        db_manager = DatabaseManager()
         
         # Limpa transações antigas
         db_manager.clear_transactions()
         
         # Salva no banco de dados
-        db_manager.save_transactions(transactions)
+        db_manager.save_transactions(df.to_dict('records'))
         
         # Verifica se os dados foram salvos corretamente
         df = db_manager.load_transactions()
@@ -61,7 +46,7 @@ def save_to_database():
         print(f"Total de transações no banco: {len(df)}")
         
     except FileNotFoundError:
-        raise Exception(f"Arquivo {csv_path} não encontrado! Execute primeiro a DAG generate_transactions.")
+        raise Exception(f"Arquivo {csv_file} não encontrado! Execute primeiro a DAG generate_transactions.")
     except Exception as e:
         raise Exception(f"Erro ao processar os dados: {str(e)}")
 
