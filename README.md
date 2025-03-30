@@ -58,7 +58,7 @@ astro dev start
 
 4. Inicie a API FastAPI:
 ```bash
-python main.py
+uv run python main.py
 ```
 
 5. Acesse o dashboard através da API:
