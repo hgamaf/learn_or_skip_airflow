@@ -41,6 +41,12 @@ uv venv
 # Ative a venv (Mac)
 source .venv/bin/activate
 
+# Instale as dependencias via pyproject.toml
+
+uv pip install -r pyproject.toml
+
+# OU
+
 # Gera o requirements.txt a partir do pyproject.toml
 uv pip compile pyproject.toml -o requirements.txt
 
