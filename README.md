@@ -35,6 +35,12 @@ cd learn_or_skip_airflow
 
 2. Instale as dependências usando `uv`:
 ```bash
+# Crie uma venv
+uv venv
+
+# Ative a venv (Mac)
+source .venv/bin/activate
+
 # Gera o requirements.txt a partir do pyproject.toml
 uv pip compile pyproject.toml -o requirements.txt
 
