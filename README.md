@@ -42,10 +42,13 @@ uv pip compile pyproject.toml -o requirements.txt
 uv pip install -r requirements.txt
 ```
 
-3. Inicie o ambiente Airflow:
+3. Inicie o ambiente Airflow através do astro-cli:
 ```bash
 astro dev start
 ```
+
+<img width="1440" alt="Captura de Tela 2025-03-29 às 14 44 28" src="https://github.com/user-attachments/assets/90d8d60d-3039-4183-8b3c-40a06cfcb091" />
+
 
 4. Inicie a API FastAPI:
 ```bash
@@ -56,6 +59,9 @@ python main.py
 - Abra o navegador em `http://localhost:8000`
 - Use o endpoint `/start-dashboard` para iniciar o dashboard
 - Acesse o dashboard em `http://localhost:8501`
+
+<img width="1440" alt="Captura de Tela 2025-03-29 às 14 45 25" src="https://github.com/user-attachments/assets/f2abb8a5-2219-40d1-83ec-e014b4b6781b" />
+
 
 ## Estrutura do Projeto
 
